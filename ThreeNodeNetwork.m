@@ -15,7 +15,7 @@ u  = spm_rand_mar(T,n,1/2)/4;         % endogenous fluctuations
 % experimental inputs (Cu = 0 to suppress)
 % -------------------------------------------------------------------------
 % Cu  = [1; 0; 0] * 0;                  % no input for resting state
-Cu  = [1; 0; 0] * 0;                  % input at node 1
+Cu  = [1; 0; 0] * 1;                  % input at node 1
 E   = cos(2*pi*TR*(1:T)/24) * 0;
 
 % priors
@@ -35,9 +35,9 @@ pP  = spm_dcm_fmri_priors(A,B,C,D,options);
 
 % true parameters (reciprocal connectivity)
 % -------------------------------------------------------------------------
-pP.A = [  0  -.2    0;
-.3    0  -.1;
-0   .2    0];
+pP.A = [  0  .2    0;
+.4    0  0;
+0   .3    0];
 pP.C = eye(n,n);
 pP.transit = randn(n,1)/16;
 
@@ -47,13 +47,18 @@ pP.transit = randn(n,1)/16;
 % integrate states
 % -------------------------------------------------------------------------
 M.f  = 'spm_fx_fmri';
-M.x  = sparse(n,5);
+% x - state vector has 5 values representating different things as detailed
+% in the 'spm_fx_fmri' function
+M.x  = sparse(n,5);                       
 U.u  = u + (Cu*E)';
 U.dt = TR;
+% Make hidden states
 x    = spm_int_J(pP,M,U);
 
 % haemodynamic observer
 % -------------------------------------------------------------------------
+
+% Convert hidden states into fmri timeseries
 for i = 1:T
 y(i,:) = spm_gx_fmri(spm_unvec(x(i,:),M.x),[],pP)';
 end
@@ -64,7 +69,7 @@ e    = spm_rand_mar(T,n,1/2)/4;
 
 % show simulated response
 %--------------------------------------------------------------------------
-i = 1:128;
+i = 1:T;
 spm_figure('Getwin','Figure 1'); clf
 subplot(2,2,1)
 plot(t(i),u(i,:))
