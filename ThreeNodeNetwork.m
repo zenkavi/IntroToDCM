@@ -14,7 +14,7 @@ u  = spm_rand_mar(T,n,1/2)/4;         % endogenous fluctuations
 % This is supposed to represent resting state activity
 
 % Plot endogenous fluctuations
-subplot(1,2,1)
+subplot(2,2,1)
 plot(t, u)
 ylim([-1 1.5])
 xlim([0 T*TR])
@@ -32,7 +32,7 @@ num_blocks = T/(on_len + 2*off_len);
 E   = repmat([repelem(0, off_len) repelem(1, on_len) repelem(0, off_len)], 1, num_blocks);
 
 % Plot experimental input
-subplot(1,2,2)
+subplot(2,2,2)
 plot(t, E)
 ylim([-1 1.5])
 xlim([0 T*TR])
@@ -75,3 +75,17 @@ U.dt = TR;
 % Make hidden states
 x    = spm_int_J(pP,M,U);
 
+% Neuronal activity
+for i = 1:T
+    tmp = spm_unvec(x(i,:),M.x);
+    neur_act(i,:) = reshape(full(tmp(:,1)),1,3);
+end
+
+% Why is the amplitude here so much lower than both the endogenous activity
+% and task input?
+% What is the "true" task parameter in this integration scheme?
+subplot(2,2,3)
+plot(t, neur_act)
+ylim([-1 1.5])
+xlim([0 T*TR])
+title('Integrated neural states')
