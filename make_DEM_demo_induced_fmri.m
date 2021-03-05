@@ -1,28 +1,11 @@
-function [DCM, options] = make_DEM_demo_induced_fmri(varargin)
+function [DCM, options] = make_DEM_demo_induced_fmri(stim_options)
 
     % DEM Structure: create random inputs
     % -------------------------------------------------------------------------
-    def_T  = 512;                             % number of observations (scans)
-    def_TR = 2;                               % repetition time or timing
-    def_n  = 3;                               % number of regions or nodes
-    def_A   = ones(n,n);
-    def_C   = zeros(n,n);
-
-    
-    p = inputParser;
-    validScalarPosNum = @(x) isnumeric(x) && isscalar(x) && (x > 0);
-    addOptional(p,'T',def_T,validScalarPosNum);
-    addOptional(p,'TR',def_TR,validScalarPosNum);
-    addOptional(p,'n',def_n,validScalarPosNum);
-    addOptional(p,'A',def_TR,validScalarPosNum);
-    addOptional(p,'C',def_n,validScalarPosNum);
-     
-    
-    T = p.Results.T;
-    TR = p.Results.TR;
-    n = p.Results.n;
-    A = p.Results.A;
-       
+    T  = stim_options.T;                             % number of observations (scans)
+    TR = stim_options.TR;                               % repetition time or timing
+    n  = stim_options.n;                               % number of regions or nodes
+   
     t  = (1:T)*TR;                        % observation times
     u  = spm_rand_mar(T,n,1/2)/4;         % endogenous fluctuations
 
@@ -33,24 +16,31 @@ function [DCM, options] = make_DEM_demo_induced_fmri(varargin)
 
     % priors
     % -------------------------------------------------------------------------
-    options.nonlinear  = 0;
-    options.two_state  = 0;
-    options.stochastic = 1;
-    options.centre     = 1;
-    options.induced    = 1;
+    options.nonlinear  = stim_options.nonlinear;
+    options.two_state  = stim_options.two_state;
+    options.stochastic = stim_options.stochastic;
+    options.centre     = stim_options.centre;
+    options.induced    = stim_options.induced;
 
-    
+    A  = stim_options.A;
     B   = zeros(n,n,0);
+    C  = stim_options.C;
     D   = zeros(n,n,0);
     pP  = spm_dcm_fmri_priors(A,B,C,D,options);
 
 
     % true parameters (reciprocal connectivity)
     % -------------------------------------------------------------------------
-    pP.A = [  0  -.2    0;
-             .3    0  -.1;
-              0   .2    0];
-    pP.C = eye(n,n);
+    
+    if ( isfield(stim_options,'Tp') )
+        pp.A = stim_options.Tp.A
+    else
+        pP.A = [  0  -.2    0;
+                 .3    0  -.1;
+                 0   .2    0];
+    end
+    
+    pP.C = eye(n,n); %used by spm_int_J to create states
     pP.transit = randn(n,1)/16;
 
     % simulate response to endogenous fluctuations
@@ -81,7 +71,7 @@ function [DCM, options] = make_DEM_demo_induced_fmri(varargin)
 
     DCM.a    = logical(pP.A);
     DCM.b    = zeros(n,n,0);
-    DCM.c    = logical(Cu);
+    DCM.c    = logical(Cu); %note this is different than pP.C used for data generation
     DCM.d    = zeros(n,n,0);
 
     % response
@@ -91,4 +81,16 @@ function [DCM, options] = make_DEM_demo_induced_fmri(varargin)
     DCM.U.u  = E';
     DCM.U.dt = TR;
 
+    % true parameters
+    % -------------------------------------------------------------------------
+    DCM.Tp.A = pP.A;
+    DCM.Tp.B = pP.B;
+    DCM.Tp.C = pP.C;
+    DCM.Tp.D = pP.D;
+    DCM.Tp.transit = pP.transit;
+    DCM.Tp.decay = pP.decay;
+    DCM.Tp.epsilon = pP.epsilon;
+    
+    options.y_dt = DCM.Y.dt;
+    
 end
