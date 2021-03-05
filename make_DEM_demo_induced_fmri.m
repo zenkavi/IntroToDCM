@@ -33,7 +33,7 @@ function [DCM, options] = make_DEM_demo_induced_fmri(stim_options)
     % -------------------------------------------------------------------------
     
     if ( isfield(stim_options,'Tp') )
-        pp.A = stim_options.Tp.A
+        pP.A = stim_options.Tp.A;
     else
         pP.A = [  0  -.2    0;
                  .3    0  -.1;
@@ -68,10 +68,20 @@ function [DCM, options] = make_DEM_demo_induced_fmri(stim_options)
     %==========================================================================
     DCM.options = options;
     DCM.n = n;
-
-    DCM.a    = logical(pP.A);
+    
+    if ( isfield(stim_options,'a') )
+        DCM.a = stim_options.a;
+    else
+        DCM.a    = logical(pP.A); %default in DEM_demo_induced_fMRI.m
+    end
+    
+    if ( isfield(stim_options,'c') )
+        DCM.c = stim_options.c;
+    else
+        DCM.c    = logical(Cu); %note this is different than pP.C used for data generation
+    end
+    
     DCM.b    = zeros(n,n,0);
-    DCM.c    = logical(Cu); %note this is different than pP.C used for data generation
     DCM.d    = zeros(n,n,0);
 
     % response
@@ -81,8 +91,9 @@ function [DCM, options] = make_DEM_demo_induced_fmri(stim_options)
     DCM.U.u  = E';
     DCM.U.dt = TR;
 
-    % true parameters
+    % true parameters (added for rDCM inversion)
     % -------------------------------------------------------------------------
+    DCM.U.name = {'null'}; 
     DCM.Tp.A = pP.A;
     DCM.Tp.B = pP.B;
     DCM.Tp.C = pP.C;
