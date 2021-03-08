@@ -4,6 +4,7 @@ function stim_options = get_default_stim_options()
     stim_options.T  = 512;                             % number of observations (scans)
     stim_options.TR = 2;                               % repetition time or timing
     stim_options.n  = n;                               % number of regions or nodes
+    stim_options.ar_coef = 1/2;
     stim_options.A   = ones(n,n);
     stim_options.C   = zeros(n,n);
     stim_options.nonlinear  = 0;

@@ -7,7 +7,8 @@ function [DCM, options] = make_DEM_demo_induced_fmri(stim_options)
     n  = stim_options.n;                               % number of regions or nodes
    
     t  = (1:T)*TR;                        % observation times
-    u  = spm_rand_mar(T,n,1/2)/4;         % endogenous fluctuations
+    ar_coef = stim_options.ar_coef;
+    u  = spm_rand_mar(T,n,ar_coef)/4;         % endogenous fluctuations
 
     % experimental inputs (Cu = 0 to suppress)
     % -------------------------------------------------------------------------
@@ -62,7 +63,7 @@ function [DCM, options] = make_DEM_demo_induced_fmri(stim_options)
 
     % observation noise process
     % -------------------------------------------------------------------------
-    e    = spm_rand_mar(T,n,1/2)/4;
+    e    = spm_rand_mar(T,n,ar_coef)/4;
 
     % priors for inversion
     %==========================================================================
