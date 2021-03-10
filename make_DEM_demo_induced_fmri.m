@@ -87,7 +87,14 @@ function [DCM, options] = make_DEM_demo_induced_fmri(stim_options)
 
     % response
     % -------------------------------------------------------------------------
-    DCM.Y.y  = y + e;
+    
+    % compute multiplicative factor
+    SNR = stim_options.SNR;
+    r = diag(std(y)/SNR);
+
+    % noisy BOLD signal time series
+    DCM.Y.y  = y + e*r;
+ 
     DCM.Y.dt = TR;
     DCM.U.u  = E';
     DCM.U.dt = TR;
