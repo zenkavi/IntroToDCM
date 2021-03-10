@@ -12,12 +12,10 @@ function stim_options = get_default_stim_options()
     stim_options.stochastic = 1;
     stim_options.centre     = 1;
     stim_options.induced    = 1;
-    stim_options.Tp.A = [  0  .2    0; .4    0  0; 0   .4    0];
+    stim_options.Tp.A = [  0  .2    0; .4    0  0; 0   .3    0];
     
     %Priors for inversion
-    a = ones(n,n);
-%     a = a.*~eye(size(a)); % set diagonals to 0
-    stim_options.a = a;
+    stim_options.a = ones(n,n);
     stim_options.c = zeros(n,1);
 
 end
