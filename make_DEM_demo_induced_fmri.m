@@ -101,11 +101,14 @@ function [DCM, options] = make_DEM_demo_induced_fmri(stim_options)
 
     % true parameters (added for rDCM inversion)
     % -------------------------------------------------------------------------
-    DCM.U.name = {'null'}; 
-%     DCM.Tp.A = pP.A; %This isn't true bc spm_fx_fmri.m resets the diagonals in EE
+    DCM.U.name = {'null'};
+    
+    %This isn't true bc spm_fx_fmri.m resets the diagonals in EE
+%     DCM.Tp.A = pP.A; 
     SE     = diag(pP.A);
     EE     = pP.A - diag(exp(SE)/2 + SE);
     DCM.Tp.A = EE;
+    
     DCM.Tp.B = pP.B;
     DCM.Tp.C = pP.C;
     DCM.Tp.D = pP.D;
