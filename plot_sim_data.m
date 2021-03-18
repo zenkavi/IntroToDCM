@@ -22,9 +22,8 @@ function plot_sim_data(DCM)
 
     subplot(1,2,2)
     plot(DCM.Y.y);
-    axis([0 512 -3 3])
+    axis([0 size(DCM.Y.y,1) -3 3])
     title("Stimulated BOLD data");
-    legend("Node 1", "Node 2", "Node 3")
     axis square
     ax = gca;
     ax.FontSize = 24;
