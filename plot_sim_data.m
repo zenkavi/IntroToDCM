@@ -1,6 +1,10 @@
 function plot_sim_data(DCM)
 
-    names = {'1' '2' '3'};
+    names = cell(1,size(DCM.Tp.A,1));
+    for i=1:size(DCM.Tp.A)
+        names{i} = sprintf("%.0f", i);
+    end
+    names = cellstr(names);
     tmp = digraph(DCM.Tp.A', names);
 
     clf
