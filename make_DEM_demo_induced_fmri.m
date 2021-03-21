@@ -73,7 +73,9 @@ function [DCM, options] = make_DEM_demo_induced_fmri(stim_options)
     if ( isfield(stim_options,'a') )
         DCM.a = stim_options.a;
     else
-        DCM.a    = logical(pP.A); %default in DEM_demo_induced_fMRI.m
+        %default in DEM_demo_induced_fMRI.m
+        %using this specifies what to be estimated in tapas_rdcm_ridge.m
+        DCM.a    = logical(pP.A); 
     end
     
     if ( isfield(stim_options,'c') )
