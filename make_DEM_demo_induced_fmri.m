@@ -41,8 +41,23 @@ function [DCM, options] = make_DEM_demo_induced_fmri(stim_options)
                  0   .2    0];
     end
     
-    pP.C = eye(n,n); %used by spm_int_J to create states
+    %used by spm_int_J to create states
+    pP.C = eye(n,n);
     pP.transit = randn(n,1)/16;
+    
+    %replace specified hemodynamic parameters
+    if (isfield(stim_options, 'transit'))
+        pP.transit = stim_options.transit;
+    end
+    
+    if (isfield(stim_options, 'decay'))
+        pP.decay = stim_options.decay;
+    end
+    
+    if (isfield(stim_options, 'epsilon'))
+        pP.epsilon = stim_options.epsilon;
+    end
+    
 
     % simulate response to endogenous fluctuations
     %==========================================================================
@@ -74,14 +89,18 @@ function [DCM, options] = make_DEM_demo_induced_fmri(stim_options)
         DCM.a = stim_options.a;
     else
         %default in DEM_demo_induced_fMRI.m
-        %using this specifies what to be estimated in tapas_rdcm_ridge.m
+        %using this specifies what parameters should be estimated in tapas_rdcm_ridge.m
         DCM.a    = logical(pP.A); 
     end
     
     if ( isfield(stim_options,'c') )
         DCM.c = stim_options.c;
     else
-        DCM.c    = logical(Cu); %note this is different than pP.C used for data generation
+        %note this is different than pP.C used for data generation
+        %for data generation identity matrix ensures endogenous activity
+        %propagation
+        %for DCM.c no input is assumed since it is endogenous
+        DCM.c    = logical(Cu); 
     end
     
     DCM.b    = zeros(n,n,0);
