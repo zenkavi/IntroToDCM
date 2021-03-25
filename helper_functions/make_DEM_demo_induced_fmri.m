@@ -5,22 +5,11 @@ function [DCM, options] = make_DEM_demo_induced_fmri(stim_options)
     T  = stim_options.T;                      % number of observations (scans)
     TR = stim_options.TR;                     % repetition time or timing
     n  = stim_options.n;                      % number of regions or nodes
-   
-    t  = (1:T)*TR;                            % observation times
-    
+       
     ar_coef = stim_options.ar_coef;
 
-    if isfield(stim_options, 'u')
-        u = stim_options.u;
-    else
-        u  = spm_rand_mar(T,n,ar_coef)/4;     % endogenous fluctuations
-    end
-
-    % experimental inputs (Cu = 0 to suppress)
-    % -------------------------------------------------------------------------
-    Cu  = ones(n, 1) * 0;
-    E   = cos(2*pi*TR*(1:T)/24) * 0;
-
+    u  = spm_rand_mar(T,n,ar_coef)/4;     % endogenous fluctuations
+    
     % priors
     % -------------------------------------------------------------------------
     options.nonlinear  = stim_options.nonlinear;
@@ -38,14 +27,7 @@ function [DCM, options] = make_DEM_demo_induced_fmri(stim_options)
 
     % true parameters (reciprocal connectivity)
     % -------------------------------------------------------------------------
-    
-    if ( isfield(stim_options,'Tp') )
-        pP.A = stim_options.Tp.A;
-    else
-        pP.A = [  0  -.2    0;
-                 .3    0  -.1;
-                 0   .2    0];
-    end
+    pP.A = stim_options.Tp.A;
     
     %used by spm_int_J to create states
     pP.C = eye(n,n);
@@ -72,7 +54,7 @@ function [DCM, options] = make_DEM_demo_induced_fmri(stim_options)
     % -------------------------------------------------------------------------
     M.f  = 'spm_fx_fmri';
     M.x  = sparse(n,5);
-    U.u  = u + (Cu*E)';
+    U.u  = u;
     U.dt = TR;
     x    = spm_int_J(pP,M,U);
 
@@ -106,15 +88,10 @@ function [DCM, options] = make_DEM_demo_induced_fmri(stim_options)
         %for data generation identity matrix ensures endogenous activity
         %propagation
         %for DCM.c no input is assumed since it is endogenous
-        DCM.c    = logical(Cu); 
+        DCM.c    = zeros(n, 1); 
     end
     
-    if isfield(stim_options, 'u')
-        DCM.b = zeros(n, n, size(stim_options.u, 2));
-    else
-        DCM.b    = zeros(n,n,0);
-    end
-    
+    DCM.b    = zeros(n,n,0);
     DCM.d    = zeros(n,n,0);
 
     % response
@@ -132,32 +109,15 @@ function [DCM, options] = make_DEM_demo_induced_fmri(stim_options)
     DCM.Y.y  = y + e*r;
     DCM.Y.dt = TR;
     
-    if isfield(stim_options, 'u')
-        DCM.U.u = U.u;
-    else
-        DCM.U.u  = E';
-    end
-    
-    
+    E = cos(2*pi*TR*(1:T)/24) * 0;
+    DCM.U.u  = E';
     DCM.U.dt = TR;
-
+    
     % true parameters (added for rDCM inversion)
     % -------------------------------------------------------------------------
-    if isfield(stim_options, 'u')
-        input_counter = 0;
-        DCM.U.name = cell(1);
-        for i=1:size(stim_options.u, 2)
-            if length(unique(stim_options.u(:, i)))>1
-                input_counter = input_counter+1;
-                DCM.U.name{input_counter} = ['u', num2str(input_counter,'%01d')];
-            end
-        end
-    else
-        DCM.U.name = {'null'};
-    end
+    DCM.U.name = {'null'};
     
-    %This isn't true bc spm_fx_fmri.m resets the diagonals in EE
-%     DCM.Tp.A = pP.A; 
+    %DCM.Tp.A ~= pP.A bc spm_fx_fmri.m resets the diagonals in EE
     SE     = diag(pP.A);
     EE     = pP.A - diag(exp(SE)/2 + SE);
     DCM.Tp.A = EE;
@@ -168,9 +128,10 @@ function [DCM, options] = make_DEM_demo_induced_fmri(stim_options)
     DCM.Tp.transit = pP.transit;
     DCM.Tp.decay = pP.decay;
     DCM.Tp.epsilon = pP.epsilon;
-    
-    DCM.M.noprint = 1;
-    
+        
     options.y_dt = DCM.Y.dt;
+    if isfield(stim_options, 'SNR')
+        options.SNR = stim_options.SNR;
+    end
     
 end
