@@ -8,10 +8,11 @@ function [DCM, options] = make_DEM_demo_induced_fmri(stim_options)
    
     t  = (1:T)*TR;                            % observation times
     
+    ar_coef = stim_options.ar_coef;
+
     if isfield(stim_options, 'u')
         u = stim_options.u;
     else
-        ar_coef = stim_options.ar_coef;
         u  = spm_rand_mar(T,n,ar_coef)/4;     % endogenous fluctuations
     end
 
@@ -124,9 +125,15 @@ function [DCM, options] = make_DEM_demo_induced_fmri(stim_options)
 
     % noisy BOLD signal time series
     DCM.Y.y  = y + e*r;
- 
     DCM.Y.dt = TR;
-    DCM.U.u  = E';
+    
+    if isfield(stim_options, 'u')
+        DCM.U.u = U.u;
+    else
+        DCM.U.u  = E';
+    end
+    
+    
     DCM.U.dt = TR;
 
     % true parameters (added for rDCM inversion)
