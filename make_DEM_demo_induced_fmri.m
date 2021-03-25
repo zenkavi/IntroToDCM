@@ -2,13 +2,18 @@ function [DCM, options] = make_DEM_demo_induced_fmri(stim_options)
 
     % DEM Structure: create random inputs
     % -------------------------------------------------------------------------
-    T  = stim_options.T;                             % number of observations (scans)
-    TR = stim_options.TR;                               % repetition time or timing
-    n  = stim_options.n;                               % number of regions or nodes
+    T  = stim_options.T;                      % number of observations (scans)
+    TR = stim_options.TR;                     % repetition time or timing
+    n  = stim_options.n;                      % number of regions or nodes
    
-    t  = (1:T)*TR;                        % observation times
-    ar_coef = stim_options.ar_coef;
-    u  = spm_rand_mar(T,n,ar_coef)/4;         % endogenous fluctuations
+    t  = (1:T)*TR;                            % observation times
+    
+    if isfield(stim_options, 'u')
+        u = stim_options.u;
+    else
+        ar_coef = stim_options.ar_coef;
+        u  = spm_rand_mar(T,n,ar_coef)/4;     % endogenous fluctuations
+    end
 
     % experimental inputs (Cu = 0 to suppress)
     % -------------------------------------------------------------------------
