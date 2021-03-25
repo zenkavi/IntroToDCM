@@ -109,7 +109,12 @@ function [DCM, options] = make_DEM_demo_induced_fmri(stim_options)
         DCM.c    = logical(Cu); 
     end
     
-    DCM.b    = zeros(n,n,0);
+    if isfield(stim_options, 'u')
+        DCM.b = zeros(n, n, size(stim_options.u, 2));
+    else
+        DCM.b    = zeros(n,n,0);
+    end
+    
     DCM.d    = zeros(n,n,0);
 
     % response
@@ -138,7 +143,18 @@ function [DCM, options] = make_DEM_demo_induced_fmri(stim_options)
 
     % true parameters (added for rDCM inversion)
     % -------------------------------------------------------------------------
-    DCM.U.name = {'null'};
+    if isfield(stim_options, 'u')
+        input_counter = 0;
+        DCM.U.name = cell(1);
+        for i=1:size(stim_options.u, 2)
+            if length(unique(stim_options.u(:, i)))>1
+                input_counter = input_counter+1;
+                DCM.U.name{input_counter} = ['u', num2str(input_counter,'%01d')];
+            end
+        end
+    else
+        DCM.U.name = {'null'};
+    end
     
     %This isn't true bc spm_fx_fmri.m resets the diagonals in EE
 %     DCM.Tp.A = pP.A; 
