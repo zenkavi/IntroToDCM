@@ -169,6 +169,8 @@ function [DCM, options] = make_DEM_demo_induced_fmri(stim_options)
     DCM.Tp.decay = pP.decay;
     DCM.Tp.epsilon = pP.epsilon;
     
+    DCM.M.noprint = 1;
+    
     options.y_dt = DCM.Y.dt;
     
 end
