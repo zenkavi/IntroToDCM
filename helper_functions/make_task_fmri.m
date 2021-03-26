@@ -49,7 +49,7 @@ function [DCM, options] = make_tapas_rdcm_generate(stim_options)
     D   = zeros(n,n,0);
     pP  = spm_dcm_fmri_priors(A,B,C,D,options);
     pP.A = stim_options.Tp.A;    
-    pP.C = eye(n,n);
+    pP.C = stim_options.c;
     pP.transit = randn(n,1)/16;
     
     DCM.Tp.transit = pP.transit;

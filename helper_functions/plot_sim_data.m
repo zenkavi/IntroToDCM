@@ -30,6 +30,7 @@ function plot_sim_data(DCM)
     plot(DCM.Y.y);
     axis([0 size(DCM.Y.y,1) min(min(DCM.Y.y))-0.1 max(max(DCM.Y.y))+0.1])
     title("Stimulated BOLD data");
+    legend("Node 1", "Node 2", "Node 3");
     axis square
     ax = gca;
     ax.FontSize = 24;
