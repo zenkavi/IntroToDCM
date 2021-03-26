@@ -1,4 +1,6 @@
 function plot_true_est_connectivity(DCM, output)
+    cmap = mycmap();   
+
     f = figure();
 
     subplot(1, 2, 1)

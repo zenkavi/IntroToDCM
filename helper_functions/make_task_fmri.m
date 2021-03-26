@@ -27,12 +27,9 @@ function [DCM, options] = make_tapas_rdcm_generate(stim_options)
         
     DCM.a = stim_options.a;
     DCM.c = stim_options.c;
-    if isfield(stim_options, 'u')
-        DCM.b = zeros(n, n, size(stim_options.u, 2));
-    else
-        DCM.b    = zeros(n,n,0);
-    end
-    
+    DCM.b = zeros(n, n, size(stim_options.u, 2));
+    DCM.d    = zeros(n,n,0);
+        
     DCM.U.u = stim_options.u;
     DCM.U.dt = stim_options.u_dt;
     input_counter = 0;
@@ -55,13 +52,21 @@ function [DCM, options] = make_tapas_rdcm_generate(stim_options)
     pP.C = eye(n,n);
     pP.transit = randn(n,1)/16;
     
+    DCM.Tp.transit = pP.transit;
+    DCM.Tp.decay = pP.decay;
+    DCM.Tp.epsilon = pP.epsilon;
+    
     M.f  = 'spm_fx_fmri';
     M.x  = sparse(n,5);
-    U.u  = stim_options.u;
+    
+    if stim_options.avoid_edge_effects
+        U.u  = repmat(stim_options.u, 3, 1);
+    else
+        U.u = stim_options.u;
+    end
     U.dt = stim_options.u_dt;
     x    = spm_int_J(pP,M,U);
-    
-    
+        
     % extract neural states only
     x_ind = zeros(1,n);
     for i = 1:n
@@ -83,11 +88,33 @@ function [DCM, options] = make_tapas_rdcm_generate(stim_options)
     % get the hemodynamic response function (HRF)
     h = options.h;
     
-    y = zeros(size(x));
-    for i = 1:n
-        y(:,i) = ifft(fft(x(:,i)).*fft(h));
+    if stim_options.avoid_edge_effects
+        [N, ~] = size(full(DCM.U.u));
+        nr     = size(DCM.a,1);
+        y = zeros(N, nr);
+        for i = 1:nr
+            tmp = ifft(fft(x(:,i)).*fft([h; zeros(N*3-length(h),1)]));
+            y(:,i) = tmp(N+1:2*N);
+        end
+        DCM.x = x(N+1:2*N);
+    else
+        y = zeros(size(x));
+        for i = 1:n
+            y(:,i) = ifft(fft(x(:,i)).*fft(h));
+        end
+        DCM.x = x;
     end
     
-    
-   
+    % Sampling
+    r_dt = stim_options.TR/stim_options.u_dt;
+    y = y(1:r_dt:end,:);
+
+    % Adding noise
+    eps = randn(size(y))*diag(std(y)/stim_options.SNR);
+    y_noise = y + eps;
+
+    % Saving the generated data
+    DCM.Y.y = y_noise;
+    DCM.Y.dt = stim_options.TR;
+    DCM.y = y;
 end

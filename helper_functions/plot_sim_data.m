@@ -36,9 +36,11 @@ function plot_sim_data(DCM)
     
     if num_plots == 3
         subplot(1, num_plots, 3)
-        plot(DCM.U.u);
+        r_dt = DCM.Y.dt/DCM.U.dt;
+        plot(DCM.U.u(1:r_dt:end,:));
         axis([0 size(DCM.Y.y,1) min(min(DCM.U.u))-0.1 max(max(DCM.U.u))+0.1])
         title("Input to each node");
+        legend("Node 1", "Node 2", "Node 3");
         axis square
         ax = gca;
         ax.FontSize = 24;

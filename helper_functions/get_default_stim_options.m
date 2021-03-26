@@ -23,5 +23,7 @@ function stim_options = get_default_stim_options()
     %Priors for inversion
     stim_options.a = ones(n,n);
     stim_options.c = zeros(n,1);
+    
+    stim_options.avoid_edge_effects = 0;
 
 end
