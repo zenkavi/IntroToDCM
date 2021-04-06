@@ -68,11 +68,7 @@ function [DCM, options] = make_tapas_rdcm_generate(stim_options)
     x    = spm_int_J(pP,M,U);
         
     % extract neural states only
-    x_ind = zeros(1,n);
-    for i = 1:n
-        x_ind(i) = (i-1)*5+1;
-    end
-    x = full(x(:, x_ind));
+    x = full(x(:, 1:n));
     
     % convolve neural states 
     % -------------------------------------------------------------------------
