@@ -21,7 +21,8 @@ function [DCM, options] = make_tapas_rdcm_generate(stim_options)
     EE     = stim_options.Tp.A - diag(exp(SE)/2 + SE);
     DCM.Tp.A = EE;
     
-    DCM.Tp.B = zeros(n,n,0);
+%     DCM.Tp.B = zeros(n,n,0);
+    DCM.Tp.B = zeros(n,n,size(stim_options.u, 2));
     DCM.Tp.C = stim_options.c;
     DCM.Tp.D = zeros(n,n,0);
         
