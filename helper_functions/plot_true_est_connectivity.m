@@ -9,6 +9,9 @@ function plot_true_est_connectivity(DCM, output)
     h.Colormap = cmap;
     h.ColorLimits = [-0.5 0.5];
     title("True A"); 
+    xlabel("From");
+    ylabel("To");
+
 
     subplot(1, 2, 2)
     
@@ -26,6 +29,8 @@ function plot_true_est_connectivity(DCM, output)
     
     h.Colormap = cmap;
     h.ColorLimits = [-0.5 0.5];
+    xlabel("From");
+    ylabel("To");
 
     set(f,'Units','normalized','Position',[0 0 1 .5]); 
 end
