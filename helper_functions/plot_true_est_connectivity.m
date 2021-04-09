@@ -12,14 +12,15 @@ function plot_true_est_connectivity(DCM, output)
 
     subplot(1, 2, 2)
     
-    if length(output == 1)
+    if length(output) == 1
         h = heatmap(output.Ep.A);
         h.CellLabelColor = 'none';
         title("Estimated A"); 
     else
-        cur_as = cellfun(@(c) {c.Ep.A}, output_all(:,i));
+        cur_as = cellfun(@(c) {c.Ep.A}, output);
         mean_a = mean(cat(3, cur_as{:}), 3);
         h = heatmap(mean_a);
+        h.CellLabelColor = 'none';
         title("Average Estimated A"); 
     end
     
