@@ -12,21 +12,22 @@ function stim_options = make_connectivity_matrix(stim_options)
     
     %Generate binary connectivity
     W = zeros(num_nodes);
-    for i= 1:ncommunities
-        for j=1:ncommunities
-            for node=1:nodespercommunity
-                %Set within network community connections
+    for i= 1:num_comms
+        for j=1:num_comms
+            for node=1:num_nodes_per_comm
+                %Within community connections
                 if i==j
-                    tmp_a = rand(nodespercommunity)<in_dsity;
-                    indstart = i*nodespercommunity;
-                    indend = i*nodespercommunity+nodespercommunity;
+                    tmp_a = rand(num_nodes_per_comm)<in_dsity;
+                    indstart = 1+(i-1)*num_nodes_per_comm;
+                    indend = i*num_nodes_per_comm;
                     W(indstart:indend,indstart:indend) = tmp_a;
                 else
-                    tmp_b = rand(nodespercommunity,nodespercommunity)<out_dsity;
-                    indstart_i = i*nodespercommunity;
-                    indend_i = i*nodespercommunity + nodespercommunity;
-                    indstart_j = j*nodespercommunity;
-                    indend_j = j*nodespercommunity + nodespercommunity;
+                %Between community connections
+                    tmp_b = rand(num_nodes_per_comm,num_nodes_per_comm)<out_dsity;
+                    indstart_i = 1+(i-1)*num_nodes_per_comm;
+                    indend_i = i*num_nodes_per_comm;
+                    indstart_j = 1+(i-1)*num_nodes_per_comm;
+                    indend_j = j*num_nodes_per_comm;
                     W(indstart_i:indend_i, indstart_j:indend_j) = tmp_b;
                 end
             end
@@ -35,14 +36,15 @@ function stim_options = make_connectivity_matrix(stim_options)
     
     hubnetwork = 1;
     if hubnetwork_dsity>0
-        for i=1:ncommunities
-            for j=1:ncommunities
+        for i=1:num_comms
+            for j=1:num_comms
+                %Hub connections
                 if (i==hubnetwork || j==hubnetwork) && i~=j
-                    tmp_b = np.random.rand(nodespercommunity,nodespercommunity)<hubnetwork_dsity;
-                    indstart_i = i*nodespercommunity;
-                    indend_i = i*nodespercommunity + nodespercommunity;
-                    indstart_j = j*nodespercommunity;
-                    indend_j = j*nodespercommunity + nodespercommunity;
+                    tmp_b = np.random.rand(num_nodes_per_comm,num_nodes_per_comm)<hubnetwork_dsity;
+                    indstart_i = 1+(i-1)*num_nodes_per_comm;
+                    indend_i = i*num_nodes_per_comm;
+                    indstart_j = 1+(i-1)*num_nodes_per_comm;
+                    indend_j = j*num_nodes_per_comm;
                     W(indstart_i:indend_i, indstart_j:indend_j) = tmp_b;
                 end
             end
@@ -51,18 +53,34 @@ function stim_options = make_connectivity_matrix(stim_options)
 
     %Make sure self-connections exist
     diag(W) = 1;
-        
-    %Synaptic scaling 
     
-    %Default options to update
-    stim_options.Tp.A = ...;
+    %Make weighted adjacency matrix based on binary matrix
+    G = zeros(num_nodes);
+    connect_ind = W~=0;
+    nconnects = sum(sum(connect_ind));
+    weights = normrnd(1.0,0.2, [nconnects,1]);
+    G(connect_ind) = weights;
+    
+    %Find num incoming connections per node
+    nodeDeg = sum(W, 2);
+
+    %Ensure inhibitory self-connections
+    diag(G) = -0.5;
+    
+    %Synaptic scaling according to number of incoming connections
+    for col=1:shape(G,1)
+        G(:,col) = G(:,col)./sqrt(nodeDeg)
+    end
+    
+    %Default options to update in stim_options
+    stim_options.Tp.A = G;
     
     stim_options.n  = num_nodes;
 
-    stim_options.A   = ones(n,n);
-    stim_options.C   = zeros(n,n);
+    stim_options.A   = ones(num_nodes,num_nodes);
+    stim_options.C   = zeros(num_nodes,num_nodes);
     
-    stim_options.a = ones(n,n);
-    stim_options.c = zeros(n,1);
+    stim_options.a = ones(num_nodes,num_nodes);
+    stim_options.c = zeros(num_nodes,1);
 
 end
