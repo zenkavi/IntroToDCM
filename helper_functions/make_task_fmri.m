@@ -22,10 +22,13 @@ function [DCM, options] = make_tapas_rdcm_generate(stim_options)
     DCM.Tp.decay = normrnd(0,1/256, [n,1]);
     DCM.Tp.epsilon = -0.0504;
     
-    %Enforce inhibitory self connections
-    SE     = diag(stim_options.Tp.A);
-    EE     = stim_options.Tp.A - diag(exp(SE)/2 + SE);
-    DCM.Tp.A = EE;
+    %Enforce inhibitory self connections if not already specified
+    if unique(diag(stim_options.Tp.A)) == 0
+        SE     = diag(stim_options.Tp.A);
+        EE     = stim_options.Tp.A - diag(exp(SE)/2 + SE);
+        DCM.Tp.A = EE;
+    else
+        DCM.Tp.A = stim_options.Tp.A;
     
 %     DCM.Tp.B = zeros(n,n,0);
     DCM.Tp.B = zeros(n,n,size(stim_options.u, 2)); %fixed for tapas_dcm_euler_gen.m
