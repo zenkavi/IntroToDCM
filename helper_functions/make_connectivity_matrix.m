@@ -72,13 +72,11 @@ function stim_options = make_connectivity_matrix(stim_options)
     
     %Default options to update in stim_options
     stim_options.Tp.A = G;
+    stim_options.Tp.C = eye(num_nodes);
     
     stim_options.n  = num_nodes;
-
-    stim_options.A   = ones(num_nodes,num_nodes);
-    stim_options.C   = zeros(num_nodes,num_nodes);
     
     stim_options.a = ones(num_nodes,num_nodes);
-    stim_options.c = zeros(num_nodes,1);
+    stim_options.c = zeros(num_nodes,num_nodes);
 
 end

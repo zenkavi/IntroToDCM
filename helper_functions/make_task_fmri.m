@@ -33,7 +33,7 @@ function [DCM, options] = make_tapas_rdcm_generate(stim_options)
     
 %     DCM.Tp.B = zeros(n,n,0);
     DCM.Tp.B = zeros(n,n,size(stim_options.u, 2)); %fixed for tapas_dcm_euler_gen.m
-    DCM.Tp.C = stim_options.c;
+    DCM.Tp.C = stim_options.Tp.C;
     DCM.Tp.D = zeros(n,n,0);
         
     DCM.a = stim_options.a;

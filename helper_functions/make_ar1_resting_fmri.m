@@ -18,9 +18,9 @@ function [DCM, options] = make_DEM_demo_induced_fmri(stim_options)
     options.centre     = stim_options.centre;
     options.induced    = stim_options.induced;
 
-    A  = stim_options.A;
+    A  = ones(n,n);%will be overwritten below
     B   = zeros(n,n,0);
-    C  = stim_options.C;
+    C  = zeros(n,n); %will be overwritten below
     D   = zeros(n,n,0);
     pP  = spm_dcm_fmri_priors(A,B,C,D,options);
 
