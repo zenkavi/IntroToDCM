@@ -14,36 +14,34 @@ function stim_options = make_connectivity_matrix(stim_options)
     W = zeros(num_nodes);
     for i= 1:num_comms
         for j=1:num_comms
-            for node=1:num_nodes_per_comm
-                %Within community connections
-                if i==j
-                    tmp_a = rand(num_nodes_per_comm)<in_dsity;
-                    indstart = 1+(i-1)*num_nodes_per_comm;
-                    indend = i*num_nodes_per_comm;
-                    W(indstart:indend,indstart:indend) = tmp_a;
-                else
+            %Within community connections
+            if i==j
+                tmp_a = rand(num_nodes_per_comm)<in_dsity;
+                indstart = 1+(i-1)*num_nodes_per_comm;
+                indend = i*num_nodes_per_comm;
+                W(indstart:indend,indstart:indend) = tmp_a;
+            else
                 %Between community connections
-                    tmp_b = rand(num_nodes_per_comm,num_nodes_per_comm)<out_dsity;
-                    indstart_i = 1+(i-1)*num_nodes_per_comm;
-                    indend_i = i*num_nodes_per_comm;
-                    indstart_j = 1+(i-1)*num_nodes_per_comm;
-                    indend_j = j*num_nodes_per_comm;
-                    W(indstart_i:indend_i, indstart_j:indend_j) = tmp_b;
-                end
+                tmp_b = rand(num_nodes_per_comm)<out_dsity;
+                indstart_i = 1+(i-1)*num_nodes_per_comm;
+                indend_i = i*num_nodes_per_comm;
+                indstart_j = 1+(j-1)*num_nodes_per_comm;
+                indend_j = j*num_nodes_per_comm;
+                W(indstart_i:indend_i, indstart_j:indend_j) = tmp_b;
             end
         end
     end
     
     hubnetwork = 1;
-    if hubnetwork_dsity>0
+    if hub_dsity>0
         for i=1:num_comms
             for j=1:num_comms
                 %Hub connections
                 if (i==hubnetwork || j==hubnetwork) && i~=j
-                    tmp_b = np.random.rand(num_nodes_per_comm,num_nodes_per_comm)<hubnetwork_dsity;
+                    tmp_b = rand(num_nodes_per_comm)<hub_dsity;
                     indstart_i = 1+(i-1)*num_nodes_per_comm;
                     indend_i = i*num_nodes_per_comm;
-                    indstart_j = 1+(i-1)*num_nodes_per_comm;
+                    indstart_j = 1+(j-1)*num_nodes_per_comm;
                     indend_j = j*num_nodes_per_comm;
                     W(indstart_i:indend_i, indstart_j:indend_j) = tmp_b;
                 end
@@ -52,7 +50,7 @@ function stim_options = make_connectivity_matrix(stim_options)
     end
 
     %Make sure self-connections exist
-    diag(W) = 1;
+%     diag(W) = 1;
     
     %Make weighted adjacency matrix based on binary matrix
     G = zeros(num_nodes);
@@ -65,11 +63,11 @@ function stim_options = make_connectivity_matrix(stim_options)
     nodeDeg = sum(W, 2);
 
     %Ensure inhibitory self-connections
-    diag(G) = -0.5;
+    G(1:num_nodes+1:end) = -0.5;
     
     %Synaptic scaling according to number of incoming connections
-    for col=1:shape(G,1)
-        G(:,col) = G(:,col)./sqrt(nodeDeg)
+    for col=1:size(G,1)
+        G(:,col) = G(:,col)./sqrt(nodeDeg);
     end
     
     %Default options to update in stim_options
