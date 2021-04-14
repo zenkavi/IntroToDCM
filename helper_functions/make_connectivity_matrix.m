@@ -7,16 +7,22 @@ function stim_options = make_connectivity_matrix(stim_options)
     out_dsity  = stim_options.out_dsity;
     hub_dsity = stim_options.hub_dsity;
     
-    if isfield('weights_mean', stim_options)
+    if isfield(stim_options, 'weights_mean')
         weights_mean = stim_options.weights_mean;
     else
         weights_mean = 0;
     end
     
-    if isfield('weights_sd', stim_options)
+    if isfield(stim_options, 'weights_sd')
         weights_sd = stim_options.weights_sd;
     else
         weights_sd = 0.2;
+    end
+    
+    if isfield(stim_options, 'self_weight')
+        self_weight = stim_options.self_weight;
+    else
+        self_weight = -.5;
     end
     
     %Make new connectivity matrix
@@ -81,7 +87,7 @@ function stim_options = make_connectivity_matrix(stim_options)
     end
     
     %Ensure inhibitory self-connections
-    G(1:num_nodes+1:end) = -.5;
+    G(1:num_nodes+1:end) = self_weight;
 
     %Default options to update in stim_options
     stim_options.Tp.A = G;
