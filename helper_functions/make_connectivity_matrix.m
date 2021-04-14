@@ -7,6 +7,18 @@ function stim_options = make_connectivity_matrix(stim_options)
     out_dsity  = stim_options.out_dsity;
     hub_dsity = stim_options.hub_dsity;
     
+    if isfield('weights_mean', stim_options)
+        weights_mean = stim_options.weights_mean;
+    else
+        weights_mean = 0;
+    end
+    
+    if isfield('weights_sd', stim_options)
+        weights_sd = stim_options.weights_sd;
+    else
+        weights_sd = 0.2;
+    end
+    
     %Make new connectivity matrix
     num_nodes = num_comms * num_nodes_per_comm;
     
@@ -49,19 +61,12 @@ function stim_options = make_connectivity_matrix(stim_options)
         end
     end
 
-    %Make sure self-connections exist
-%     diag(W) = 1;
-    
     %Make weighted adjacency matrix based on binary matrix
     G = zeros(num_nodes);
     connect_ind = W~=0;
     nconnects = sum(sum(connect_ind));
     
-    weights = normrnd(0,.2, [nconnects,1]);
-%     weights = normrnd(1.0,0.2, [nconnects,1]);
-    %make half of the connections inhibitory
-%     weights(1:floor(nconnects/2)) = weights(1:floor(nconnects/2))*-1;
-%     weights = weights(randperm(nconnects));
+    weights = normrnd(weights_mean, weights_sd, [nconnects,1]);
     
     G(connect_ind) = weights;
     
