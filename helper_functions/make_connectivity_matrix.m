@@ -56,7 +56,13 @@ function stim_options = make_connectivity_matrix(stim_options)
     G = zeros(num_nodes);
     connect_ind = W~=0;
     nconnects = sum(sum(connect_ind));
-    weights = normrnd(1.0,0.2, [nconnects,1]);
+    
+    weights = normrnd(0,.2, [nconnects,1]);
+%     weights = normrnd(1.0,0.2, [nconnects,1]);
+    %make half of the connections inhibitory
+%     weights(1:floor(nconnects/2)) = weights(1:floor(nconnects/2))*-1;
+%     weights = weights(randperm(nconnects));
+    
     G(connect_ind) = weights;
     
     %Find num incoming connections per node
@@ -70,7 +76,7 @@ function stim_options = make_connectivity_matrix(stim_options)
     end
     
     %Ensure inhibitory self-connections
-    G(1:num_nodes+1:end) = -1;
+    G(1:num_nodes+1:end) = -.5;
 
     %Default options to update in stim_options
     stim_options.Tp.A = G;
