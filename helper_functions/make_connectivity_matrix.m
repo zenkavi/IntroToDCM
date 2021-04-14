@@ -61,15 +61,17 @@ function stim_options = make_connectivity_matrix(stim_options)
     
     %Find num incoming connections per node
     nodeDeg = sum(W, 2);
-
-    %Ensure inhibitory self-connections
-    G(1:num_nodes+1:end) = -0.5;
     
     %Synaptic scaling according to number of incoming connections
     for col=1:size(G,1)
-        G(:,col) = G(:,col)./sqrt(nodeDeg);
+        if nodeDeg > 0
+            G(:,col) = G(:,col)./sqrt(nodeDeg);
+        end
     end
     
+    %Ensure inhibitory self-connections
+    G(1:num_nodes+1:end) = -1;
+
     %Default options to update in stim_options
     stim_options.Tp.A = G;
     stim_options.Tp.C = eye(num_nodes);
