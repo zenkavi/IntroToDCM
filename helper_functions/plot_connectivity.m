@@ -7,11 +7,8 @@ function plot_connectivity(A)
     h.CellLabelColor = 'none';
     h.Colormap = cmap;
 
-    if (abs(min(min(A))) > abs(max(max(A))))
-        col_lim = abs(min(min(A)));
-    else
-        col_lim = abs(max(max(A)));
-    end
+    col_lims = [abs(min(min(A))) abs(max(max(A)))];
+    col_lim = max(col_lims);
 
     h.ColorLimits = [-1*col_lim col_lim];
     title("True A"); 
