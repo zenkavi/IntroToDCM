@@ -6,6 +6,7 @@ function plot_true_est_connectivity(DCM, output, auto_scale)
     else
         cur_as = cellfun(@(c) {c.Ep.A}, output);
         mean_a = mean(cat(3, cur_as{:}), 3);
+        col_lims = [abs(min(min(DCM.Tp.A))) abs(max(max(DCM.Tp.A))) abs(min(min(mean_a))) abs(max(max(mean_a)))];
     end
     
     if auto_scale == 1
