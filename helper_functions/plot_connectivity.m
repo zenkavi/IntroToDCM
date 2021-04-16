@@ -1,8 +1,6 @@
 function plot_connectivity(A)
     cmap = mycmap();   
 
-    f = figure();
-
     h = heatmap(A);
     h.CellLabelColor = 'none';
     h.Colormap = cmap;
@@ -18,5 +16,8 @@ function plot_connectivity(A)
     grid(h, 'off');
     h.XDisplayLabels = repmat(" ", size(A, 1), 1);
     h.YDisplayLabels = repmat(" ", size(A, 1), 1);
+    
+    ax = gca;
+    ax.FontSize = 24;
 
 end

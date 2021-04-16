@@ -30,6 +30,8 @@ function plot_true_est_connectivity(DCM, output, auto_scale)
         h.XDisplayLabels = repmat(" ", size(DCM.Tp.A, 1), 1);
         h.YDisplayLabels = repmat(" ", size(DCM.Tp.A, 1), 1);
     end
+    ax = gca;
+    ax.FontSize = 24;
 
     subplot(1, 2, 2)
     
@@ -53,6 +55,8 @@ function plot_true_est_connectivity(DCM, output, auto_scale)
         h.XDisplayLabels = repmat(" ", size(DCM.Tp.A, 1), 1);
         h.YDisplayLabels = repmat(" ", size(DCM.Tp.A, 1), 1);
     end
+    ax = gca;
+    ax.FontSize = 24;
 
     set(f,'Units','normalized','Position',[0 0 1 .5]); 
 end
