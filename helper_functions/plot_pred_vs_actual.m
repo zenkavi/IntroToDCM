@@ -20,7 +20,7 @@ function plot_pred_vs_actual(DCM, output, num_nodes, freq)
             P1(2:end-1) = 2*P1(2:end-1);
 
             plot(f,P1)
-            title(sprintf('Single-Sided Amplitude Spectrum of Y(t) for node %.0f'), i)
+            title(sprintf('Single-Sided Amplitude Spectrum of Y(t) for node %d', i))
             xlabel('f (Hz)')
             ylabel('|P1(f)|')
 
@@ -44,7 +44,7 @@ function plot_pred_vs_actual(DCM, output, num_nodes, freq)
 
             plot(y_source(:,i))
 
-            title(sprintf('Time series y(t) %.0f'), i)
+            title(sprintf('Time series y(t) for node %d', i))
             xlabel('t (sec)')
             ylabel('y(t)')
 
