@@ -37,9 +37,9 @@ function [DCM, options] = make_tapas_rdcm_generate(stim_options)
     DCM.Tp.D = zeros(n,n,0);
         
     DCM.a = stim_options.a;
-    DCM.c = stim_options.c;
+    DCM.c = stim_options.Tp.C;
     DCM.b = zeros(n, n, size(stim_options.u, 2));
-    DCM.d    = zeros(n,n,0);
+    DCM.d = zeros(n,n,0);
         
     DCM.U.u = stim_options.u;
     DCM.U.dt = stim_options.u_dt;

@@ -1,4 +1,4 @@
-function plot_connectivity(A)
+function plot_connectivity(A, clear_labs)
     cmap = mycmap();   
 
     h = heatmap(A);
@@ -14,8 +14,11 @@ function plot_connectivity(A)
     ylabel("To");
 
     grid(h, 'off');
-    h.XDisplayLabels = repmat(" ", size(A, 2), 1);
-    h.YDisplayLabels = repmat(" ", size(A, 1), 1);
+    
+    if clear_labs
+        h.XDisplayLabels = repmat(" ", size(A, 2), 1);
+        h.YDisplayLabels = repmat(" ", size(A, 1), 1);
+    end
     
     ax = gca;
     ax.FontSize = 24;

@@ -16,7 +16,7 @@ function plot_pred_vs_actual(DCM, output, num_nodes, freq)
 
             Y = yd_source_fft(:,i);
             P2 = abs(Y/L);
-            P1 = P2(1:L/2+1);
+            P1 = P2(1:floor(L/2)+1);
             P1(2:end-1) = 2*P1(2:end-1);
 
             plot(f,P1)
@@ -26,7 +26,7 @@ function plot_pred_vs_actual(DCM, output, num_nodes, freq)
 
             Y = yd_pred_rdcm_fft(:, i);
             P2 = abs(Y/L);
-            P1 = P2(1:L/2+1);
+            P1 = P2(1:floor(L/2)+1);
             P1(2:end-1) = 2*P1(2:end-1);
 
             hold on
