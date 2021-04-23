@@ -27,7 +27,7 @@ function stim_options = get_default_stim_options(stim_type)
         for i=1:length(stim_options.stim_node)
             stim_options.Tp.C(stim_options.stim_node(i),i) = 1;
         end
-        stim_options.c = zeros(n,length(stim_options.stim_node));
+        stim_options.c = stim_options.Tp.C;
     end
     
     %Used by tapas_rdcm_sparse.m and tapas_rdcm_ridge.m
