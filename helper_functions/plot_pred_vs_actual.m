@@ -1,4 +1,6 @@
 function plot_pred_vs_actual(DCM, output, num_nodes, freq)
+    
+    fig = figure();
 
     if freq
         Fs = DCM.Y.dt;            % Sampling frequency
@@ -6,11 +8,11 @@ function plot_pred_vs_actual(DCM, output, num_nodes, freq)
         f = Fs*(0:(L/2))/L;       % Frequency bins
 
         yd_source_fft = reshape(output.signal.yd_source_fft, size(DCM.Y.y, 1), size(DCM.Y.y, 2));
-        yd_pred_rdcm_fft = reshape(output.signal.yd_pred_rdcm_fft, size(DCM.Y.y, 1), size(DCM.Y.y, 2))
+        yd_pred_rdcm_fft = reshape(output.signal.yd_pred_rdcm_fft, size(DCM.Y.y, 1), size(DCM.Y.y, 2));
 
         clf
         for i=1:num_nodes
-            subplot(5, 1, i)
+            subplot(num_nodes, 1, i)
 
             Y = yd_source_fft(:,i);
             P2 = abs(Y/L);
@@ -18,7 +20,7 @@ function plot_pred_vs_actual(DCM, output, num_nodes, freq)
             P1(2:end-1) = 2*P1(2:end-1);
 
             plot(f,P1)
-            title('Single-Sided Amplitude Spectrum of Y(t)')
+            title(sprintf('Single-Sided Amplitude Spectrum of Y(t) for node %.0f'), i)
             xlabel('f (Hz)')
             ylabel('|P1(f)|')
 
@@ -38,11 +40,11 @@ function plot_pred_vs_actual(DCM, output, num_nodes, freq)
 
         clf
         for i=1:num_nodes
-            subplot(5, 1, i)
+            subplot(num_nodes, 1, i)
 
             plot(y_source(:,i))
 
-            title('Time series y(t)')
+            title(sprintf('Time series y(t) %.0f'), i)
             xlabel('t (sec)')
             ylabel('y(t)')
 
@@ -51,5 +53,6 @@ function plot_pred_vs_actual(DCM, output, num_nodes, freq)
             legend("True", "Predicted")
         end
     end
-
+    
+    set(fig,'Units','normalized','Position',[0 0 1 .5]); 
 end
