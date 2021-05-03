@@ -8,7 +8,7 @@ function [DCM, options] = make_DEM_demo_induced_fmri(stim_options)
        
     ar_coef = stim_options.ar_coef;
 
-    u  = spm_rand_mar(T,n,ar_coef)/4;     % endogenous fluctuations
+    u  = spm_rand_mar(T,n,ar_coef)/4;         % endogenous fluctuations
     
     % priors
     % -------------------------------------------------------------------------
@@ -18,34 +18,20 @@ function [DCM, options] = make_DEM_demo_induced_fmri(stim_options)
     options.centre     = stim_options.centre;
     options.induced    = stim_options.induced;
 
-    A  = ones(n,n);%will be overwritten below
-    B   = zeros(n,n,0);
-    C  = zeros(n,n); %will be overwritten below
-    D   = zeros(n,n,0);
-    pP  = spm_dcm_fmri_priors(A,B,C,D,options);
-
-
     % true parameters (reciprocal connectivity)
     % -------------------------------------------------------------------------
     pP.A = stim_options.Tp.A;
     
+    pP.B = zeros(n, n, n);
+    pP.D = zeros(n, n, n);
+    
     %used by spm_int_J to create states
     pP.C = eye(n,n);
-    pP.transit = randn(n,1)/16;
     
     %replace specified hemodynamic parameters
-    if (isfield(stim_options, 'transit'))
-        pP.transit = stim_options.transit;
-    end
-    
-    if (isfield(stim_options, 'decay'))
-        pP.decay = stim_options.decay;
-    end
-    
-    if (isfield(stim_options, 'epsilon'))
-        pP.epsilon = stim_options.epsilon;
-    end
-    
+    pP.transit = stim_options.transit;
+    pP.decay = stim_options.decay;
+    pP.epsilon = stim_options.epsilon;
 
     % simulate response to endogenous fluctuations
     %==========================================================================
@@ -73,24 +59,14 @@ function [DCM, options] = make_DEM_demo_induced_fmri(stim_options)
     DCM.options = options;
     DCM.n = n;
     
-    if ( isfield(stim_options,'a') )
-        DCM.a = stim_options.a;
-    else
-        %default in DEM_demo_induced_fMRI.m
-        %using this specifies what parameters should be estimated in tapas_rdcm_ridge.m
-        DCM.a    = logical(pP.A); 
-    end
-    
-    if ( isfield(stim_options,'c') )
-        DCM.c = stim_options.c;
-    else
-        %note this is different than pP.C used for data generation
-        %for data generation identity matrix ensures endogenous activity
-        %propagation
-        %for DCM.c no input is assumed since it is endogenous
-        DCM.c    = zeros(n, 1); 
-    end
-    
+    DCM.a    = logical(pP.A); 
+        
+    %note this is different than pP.C used for data generation
+    %for data generation identity matrix ensures endogenous activity
+    %propagation
+    %for DCM.c no input is assumed since it is endogenous
+    DCM.c    = zeros(n, 1); 
+        
     DCM.b    = zeros(n,n,0);
     DCM.d    = zeros(n,n,0);
 
@@ -109,22 +85,16 @@ function [DCM, options] = make_DEM_demo_induced_fmri(stim_options)
     DCM.Y.y  = y + e*r;
     DCM.Y.dt = TR;
     
-    E = cos(2*pi*TR*(1:T)/24) * 0;
-    DCM.U.u  = E';
-    DCM.U.dt = TR;
-    
     % true parameters (added for rDCM inversion)
-    % -------------------------------------------------------------------------
-    DCM.U.name = {'null'};
-    
+    % -------------------------------------------------------------------------    
     %DCM.Tp.A ~= pP.A bc spm_fx_fmri.m resets the diagonals in EE
     SE     = diag(pP.A);
     EE     = pP.A - diag(exp(SE)/2 + SE);
     DCM.Tp.A = EE;
     
-    DCM.Tp.B = pP.B;
-    DCM.Tp.C = pP.C;
-    DCM.Tp.D = pP.D;
+    DCM.Tp.B = zeros(n,n,1);
+    DCM.Tp.C = zeros(n,1);
+    DCM.Tp.D = [];
     DCM.Tp.transit = pP.transit;
     DCM.Tp.decay = pP.decay;
     DCM.Tp.epsilon = pP.epsilon;

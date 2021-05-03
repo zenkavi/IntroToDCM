@@ -21,6 +21,9 @@ function stim_options = get_default_stim_options(stim_type)
         stim_options.ar_coef = 1/2;
         stim_options.Tp.C = eye(n);
         stim_options.c = zeros(n,n);
+        stim_options.transit = normrnd(0,1/256,[stim_options.n,1]);
+        stim_options.decay = normrnd(0,1/256);
+        stim_options.epsilon = normrnd(0,1/256);
     else
         stim_options.stim_node = 1;
         stim_options.Tp.C = zeros(n,length(stim_options.stim_node));
